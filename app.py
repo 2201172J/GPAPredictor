@@ -3,38 +3,28 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Load the trained model and scaler
 model = joblib.load('tunedGBR.pkl')
 scaler = joblib.load('scaler.pkl')
 
-# Define numerical columns
 numericColumns = ['Age', 'StudyTimeWeekly', 'Absences']
 
-# Define the prediction function
 def predictGpa(data):
-    featureNames = ['Age', 'Gender', 'Ethnicity', 'ParentalEducation', 'StudyTimeWeekly',
-                     'Absences', 'Tutoring', 'ParentalSupport', 'Extracurricular', 'Sports',
-                     'Music', 'Volunteering']
+    featureNames = ['Age', 'Gender', 'Ethnicity', 'ParentalEducation', 'StudyTimeWeekly', 'Absences', 'Tutoring', 'ParentalSupport', 'Extracurricular', 'Sports', 'Music', 'Volunteering']
     
-    # Ensure the input data has all the required features in the correct order
     data = data[featureNames]
     
-    # Scale the numerical features
     data[numericColumns] = scaler.transform(data[numericColumns])
     
     prediction = model.predict(data)
-    predictionClipped = np.clip(prediction, 0, 4.0)  # Clip the prediction to a maximum of 4.0
+    predictionClipped = np.clip(prediction, 0, 4.0)
     return predictionClipped
 
-# Streamlit web app
-st.set_page_config(page_title = "GPA Prediction App", page_icon = ":books:", layout = "wide")
+st.set_page_config(page_title = "GPA Prediction Web App", page_icon = ":books:", layout = "wide")
 
-# Main header
 st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Student GPA Predictor</h1>", unsafe_allow_html = True)
-st.markdown("<h3 style='text-align: center; color: #4CAF50;'>Predict your GPA based on various features</h3>", unsafe_allow_html = True)
+st.markdown("<h3 style='text-align: center; color: #4CAF50;'>Predicts GPA based on various features</h3>", unsafe_allow_html = True)
 st.write("")
 
-# Add custom CSS for better design
 st.markdown(
     """
     <style>
@@ -76,7 +66,6 @@ st.markdown(
     unsafe_allow_html = True
 )
 
-# User inputs in the sidebar
 st.sidebar.header("Input Features")
 age = st.sidebar.number_input('Age', min_value = 15, max_value = 18)
 gender = st.sidebar.selectbox('Gender', [0, 1], format_func = lambda x: 'Male' if x == 0 else 'Female')
@@ -91,7 +80,6 @@ sports = st.sidebar.selectbox('Sports', [0, 1], format_func = lambda x: 'No' if 
 music = st.sidebar.selectbox('Music', [0, 1], format_func = lambda x: 'No' if x == 0 else 'Yes')
 volunteering = st.sidebar.selectbox('Volunteering', [0, 1], format_func = lambda x: 'No' if x == 0 else 'Yes')
 
-# Create a DataFrame for the input data
 inputData = pd.DataFrame({
     'Age': [age],
     'Gender': [gender],
@@ -107,7 +95,6 @@ inputData = pd.DataFrame({
     'Volunteering': [volunteering]
 })
 
-# Predict GPA
 if st.sidebar.button('Predict GPA'):
     prediction = predictGpa(inputData)
     st.markdown("<h2 style='text-align: center; color: #4CAF50;'>Predicted GPA</h2>", unsafe_allow_html = True)
@@ -115,7 +102,6 @@ if st.sidebar.button('Predict GPA'):
 else:
     st.markdown("<h2 style='text-align: center; color: #4CAF50;'>Awaiting input features...</h2>", unsafe_allow_html = True)
 
-# Add footer with styling
 st.markdown("""
     <style>
         .footer {
